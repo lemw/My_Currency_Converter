@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">My Currency Converter</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">Currency Converter</string>
+    <string name="select_currency">Select Currency</string>
+    <string name="from_currency">From:</string>
+    <string name="to_currency">To:</string>
+    <string name="amount">Amount:</string>
+    <string-array name="currency_name_array">
+        <item >---</item>
+        <item >AUD</item>
+        <item >USD</item>
+        <item >SEK</item>
+        <item >EURO</item>
+        <item >YEN</item>
+    </string-array>
+    <string-array name="currency_rate_array">
+        <item >0.0</item>
+        <item >6.91</item>
+        <item >6.69</item>
+        <item >1.00</item>
+        <item >8.50</item>
+        <item >1464</item>
+    </string-array>
+</resources>
