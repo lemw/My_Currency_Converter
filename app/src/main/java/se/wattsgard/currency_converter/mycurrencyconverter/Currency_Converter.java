@@ -2,6 +2,8 @@ package se.wattsgard.currency_converter.mycurrencyconverter;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -32,16 +34,15 @@ public class Currency_Converter extends AppCompatActivity {
         Log.v(myLogTag, "Now the activity has been created");
         setUpTheSpinners();
 
-        fromAmount = (EditText) findViewById(R.id.editTextFromAmount);
+        //Handle the output field with the conversion result...
         resultText = (TextView) findViewById(R.id.resultsTextView);
 
-    }
+        //Handle the textWatcher
+        TextWatcher textWatcher = new MyTextWatcher();
+        fromAmount = (EditText) findViewById(R.id.editTextFromAmount);
+        fromAmount.addTextChangedListener(textWatcher);
 
-/*    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_currency_converter , menu);
-        Log.v(myLogTag, "Now the options menu has been created!");
-        return true;
-    } */
+    }
 
     public void setUpTheSpinners() {
         // This is to set the spinners with the currency names
@@ -58,76 +59,70 @@ public class Currency_Converter extends AppCompatActivity {
         spinnerTo.setAdapter(adapter);
         spinnerTo.setOnItemSelectedListener(listener);
 
+
         Log.v(myLogTag, "Now the Spinners are setup");
-
-
     }
 
-
-    private class CalculateResultListener implements AdapterView.OnItemSelectedListener {
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-            //Adding logs
-            Log.v(myLogTag, "Now we got a CalculateResultListener");
-
-            int selectedIndex = spinnerFrom.getSelectedItemPosition();
-
-            Log.v(myLogTag, "Index was something");
-
-            //Whenever a spinner is selected, we shall try to calculate the outcome
-            double toAmount =  calculateOutcome();
-            //resultText.setText(toAmount);
-            resultText.setText(Double.toString(toAmount));
-
-            Log.v(myLogTag, "Amount was something");
-            Log.v(myLogTag, Double.toString(toAmount));
-
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-
-        }
-    }
-
-    private double calculateOutcome() {
-        //Wonder where to do the check if all required fields are selected or not
-        //If to do it here, or to override each and every fields onSelect, and then
-        //use this method once all is properly filled in.
-
+    private void calculateOutcome() {
 
         //Get all the data needed to do the conversion.
-
         String [] rates = getResources().getStringArray(R.array.currency_rate_array);
         int indexFrom = spinnerFrom.getSelectedItemPosition();
         int indexTo = spinnerTo.getSelectedItemPosition();
+        Log.v(myLogTag, "starting sanity check of values  " );
 
-
-        if (sanityCheckonValues()) {
+        if (sanityCheckValues()) {
             //Only run this part of the activity in case the input data is ok
-            double fromMoney = Double.parseDouble( resultText.toString() );
+
+            //Amount of money to convert
+            Log.v(myLogTag, "fromMoney string is  " + fromAmount.getText().toString() );
+            double fromMoney = Double.parseDouble( fromAmount.getText().toString());
+            Log.v(myLogTag, "fromMoney is  " + fromMoney);
+
+            //From rate
+            Log.v(myLogTag, "rateFrom string is  " + rates[indexFrom]);
             double rateFrom = Double.parseDouble(rates[indexFrom]);
+            Log.v(myLogTag, "rateFrom is  " + rateFrom);
+
+            //To rate!
+            Log.v(myLogTag, "rateTo string is  " + rates[indexTo]);
             double rateTo = Double.parseDouble(rates[indexTo]);
-            double finalSum = fromMoney * (rateTo / rateFrom);
-            return finalSum;
+            Log.v(myLogTag, "rateTo is  " + rateTo);
+
+            //Calculating the final sum
+            Log.v(myLogTag, "finalSum is  calculated now...");
+            double finalSum = fromMoney * ( rateFrom / rateTo);
+            Log.v(myLogTag, "finalSum is  " + finalSum);
+            //return finalSum;
+
+            String [] currencies = getResources().getStringArray(R.array.currency_name_array);
+            String formattedString = String.format("%.2f %s", finalSum, currencies[spinnerTo.getSelectedItemPosition()]);
+            resultText.setText(formattedString);
+
         }
 
         // Need to reconsider how to handle to NOT update
         // the output text field
-        return 0.0;
+        //return 0.0;
 
     }
 
-    private boolean sanityCheckonValues() {
+    private boolean sanityCheckValues() {
         boolean valuesOk = false;
+
+        Log.v(myLogTag, "sanityCheckValues starting");
+        Log.v(myLogTag, "Checking if all values are ok...");
 
         //Check the first spinner
         int indexFrom = spinnerFrom.getSelectedItemPosition();
         if (indexFrom > 0 ) {
             //This means that the spinnerFrom has a valid value...
             valuesOk = true;
+            Log.v(myLogTag, "spinnerFrom has index, proceeding... " + indexFrom );
+
         } else {
+            Log.v(myLogTag, "spinnerFrom has index=0, stopping");
+
             return false;
         }
 
@@ -135,29 +130,66 @@ public class Currency_Converter extends AppCompatActivity {
         int indexTo = spinnerTo.getSelectedItemPosition();
         if (valuesOk & (indexTo > 0) ) {
             //This means that spinnerTo has a valid value
+            Log.v(myLogTag, "spinnerTo has index, proceeding... " + indexTo );
             valuesOk = true;
         } else {
             //Otherwise we return false
+            Log.v(myLogTag, "spinnerTo has index=0, stopping");
             return false;
         }
 
         //Check the fromAmount so that it is actually is something.
         //The field itself is already secured since it is set to
         //digits only
-        double tempDouble = Double.parseDouble( fromAmount.getText().toString());
-
-        resultText.setText(Double.toString(tempDouble));
-                /*
-        if (valuesOk & !(String.() fromAmount.toString(""))) {
-            //If inside here, it means both spinners are ok,
-            //and the value of the field fromAmount is NOT ""
-            //That means all values should be ok and we can go ahead and return a TRUE
+        try {
+            //To make sure to catch the exception in case the text in the
+            //from amount is not a number...
+            double tempDouble = Double.parseDouble(fromAmount.getText().toString());
+            Log.v(myLogTag, "succeeded with converting the fromAmount " + tempDouble);
             valuesOk = true;
         }
-        */
+        catch (Exception e) {
+            //We just got an exception, so there must be something wrong.
+            //Setting valuesOk to false!
+            valuesOk = false;
+            Log.v(myLogTag, "Exception caught...");
+            Log.v(myLogTag, "Exception!" + e);
+            return valuesOk;
+        }
 
+        Log.v(myLogTag, "sanityCheckValues done, result is " + valuesOk);
         return valuesOk;
 
+    }
+    //This is to monitor the spinners...
+    private class CalculateResultListener implements AdapterView.OnItemSelectedListener {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+            Log.v(myLogTag, "Now we got a CalculateResultListener, let's try to calculate the results");
+
+            //Whenever a spinner is selected, we shall try to calculate the outcome
+            calculateOutcome();
+            Log.v(myLogTag, "Tried, dunno if it worked, Index changed");
+
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {}
+    }
+    //This is to monitor the editText field...
+    private class MyTextWatcher implements TextWatcher {
+
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            //Seems I never manage to get in here .... :-(
+            Log.v(myLogTag, "Now we got a TextWatcher event onTextChanged, let's try to calculate the results");
+            calculateOutcome();
+            Log.v(myLogTag, "Tried to calculate, dunno if it worked, TEXT changed");
+
+        }
+        public void afterTextChanged(Editable s) {}
+
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
     }
 
 
