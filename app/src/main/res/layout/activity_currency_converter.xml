@@ -24,7 +24,7 @@
         <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/spinner"
+            android:id="@+id/spinnerFrom"
             android:spinnerMode="dropdown"
             android:entries="@array/currency_name_array"/>
 
@@ -38,9 +38,17 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="number"
             android:ems="10"
-            android:id="@+id/editText" />
+            android:id="@+id/editTextFromAmount"
+            android:enabled="true"
+            android:editable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:elegantTextHeight="false"
+            android:inputType="numberDecimal"
+            android:clickable="true"
+            android:contextClickable="true"
+            android:digits="true" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -52,7 +60,7 @@
         <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/spinner2"
+            android:id="@+id/spinnerTo"
             android:entries="@array/currency_name_array"/>
 
         <TextView
@@ -62,12 +70,13 @@
             android:text="@string/amount"
             android:id="@+id/textView4" />
 
-        <EditText
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/editText2" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Medium Text"
+            android:id="@+id/resultsTextView"
+            android:layout_gravity="center_vertical" />
 
     </LinearLayout>
 
